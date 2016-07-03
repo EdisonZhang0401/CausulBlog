@@ -1,0 +1,59 @@
+---
+layout: default
+---
+<style type="text/css">
+a{
+    color: #424242;
+    text-decoration: none;
+
+}
+a:visited {
+        color: #424242;
+    }
+a:hover {
+        color: #f45923;
+    }
+.post-link{
+  margin: 0 20px 10px 0;
+    font-family: "brandon-grotesque", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 60px;
+    line-height: 1;
+    letter-spacing: .04em;
+    display: inline-block;
+}
+.start{
+  margin-right: 10px;
+color: #f45923;
+}
+.wrapper a.post-link{
+  font-size: 24px;
+} 
+.post-meta{
+  margin: 0 0 6px 0;
+    font-family: "brandon-grotesque", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: rgba(0, 0, 0, 0.3);
+}
+</style>
+<div class="home">
+
+  <ul class="post-list">
+    {% for post in site.posts %}
+      <li>
+        <h2>
+          <span class="start">•</span>
+          <a class="post-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
+        </h2>
+
+        <span class="post-meta">{{ post.date | date: "%b %-d, %Y" }}</span>
+      </li>
+    {% endfor %}
+  </ul>
+
+  <p class="rss-subscribe">subscribe <a href="{{ "/feed.xml" | prepend: site.baseurl }}">via RSS</a></p>
+
+</div>
