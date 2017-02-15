@@ -1,11 +1,10 @@
----
+﻿---
 layout: post
-title:  "Welcome to Jekyll!"
-date:   2016-02-22 23:08:35 +0800
-categories: jekyll update
+title:  "First Blog"
+date:   2017-02-14 23:08:35 +0800
+categories:Jekyll
 ---
-Hello world!!
-肉丝
+这是我的第一个博客
 {% highlight ruby %}
 def print_hi(name)
   puts "Hi, #{name}"
