@@ -1,10 +1,10 @@
 ﻿---
 layout: post
-title: "First Blog"
-date: 2017-02-14 23:08:35 +0800
+title: "Second Blog第二个"
+date: 2017-02-15 23:08:35 +0800
 categories:Jekyll Update
 ---
-这是我的第一个博客
+这是我的第二个博客
 {% highlight ruby %}
 def print_hi(name)
   puts "Hi, #{name}"
