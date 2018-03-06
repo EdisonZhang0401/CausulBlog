@@ -1,4 +1,4 @@
-<!-- <!DOCTYPE html>    
+<!DOCTYPE html>    
 <html xmlns="http://www.w3.org/1999/xhtml">    
 <head>    
     <title>HTML5 GetUserMedia Demo</title>    
@@ -110,39 +110,7 @@
     
     </script>    
 </body>    
-</html>    --> 
+</html>    
 
-<!DOCTYPE html>
-<html>
-    <head>
-    <meta charset="utf-8">
-    <title>Camera Example</title>
-    <script type="text/javascript">
-// 扩展API加载完毕后调用onPlusReady回调函数 
-document.addEventListener( "plusready", onPlusReady, false );
-// 扩展API加载完毕，现在可以正常调用扩展API 
-function onPlusReady() {
-    console.log("plusready");
-}
-// 摄像
-function videoCapture(){
-    var cmr = plus.camera.getCamera();
-    var res = cmr.supportedVideoResolutions[0];
-    var fmt = cmr.supportedVideoFormats[0];
-    console.log("Resolution: "+res+", Format: "+fmt);
-    cmr.startVideoCapture( function( path ){
-            alert( "Capture video success: " + path );  
-        },
-        function( error ) {
-            alert( "Capture video failed: " + error.message );
-        },
-        {resolution:res,format:fmt}
-    );
-}
-    </script>
-    </head>
-    <body>
-        <button onclick="videoCapture()">摄像</button>
-    </body>
-</html>
+
 
