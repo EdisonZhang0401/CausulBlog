@@ -23,8 +23,7 @@
         var canvas2 = document.getElementById('canvas2');    
         var context2 = canvas2.getContext('2d');    
     
-        // navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;    
-        navigator.getUserMedia = navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;  
+        navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
         window.URL = window.URL || window.webkitURL || window.mozURL || window.msURL;    
     
         var exArray = []; //存储设备源ID    
