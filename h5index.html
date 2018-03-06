@@ -27,7 +27,8 @@
 </head>    
 <body>    
     <div class="contentWrap">
-        <input id="button111" type="button" title="开启摄像头" value="开启摄像头" onclick="getMedia();" /><br />    
+        <input id="button1" type="button" title="开启前摄像头" value="开启前摄像头" onclick="getMedia(0);" />
+        <input id="button2" type="button" title="开启后摄像头" value="开启后摄像头" onclick="getMedia(1);" /><br />    
         <video id="video1" autoplay="autoplay"></video><hr />    
         <input type="button" title="拍照" value="拍照" onclick="getPhoto();" /><br />    
         <canvas id="canvas1" ></canvas>  
@@ -54,12 +55,12 @@
             }    
         });    
           
-        function getMedia() {    
+        function getMedia(num) {    
             if (navigator.getUserMedia) {    
                 navigator.getUserMedia({    
                     'video': {    
                         'optional': [{    
-                            'sourceId': exArray[0] //0为前置摄像头，1为后置    
+                            'sourceId': exArray[num] //0为前置摄像头，1为后置    
                         }]    
                     },    
                     'audio':true    
