@@ -3,15 +3,33 @@
 <head>    
     <title>HTML5 GetUserMedia Demo</title>    
     <meta charset="utf-8"/>  
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+    <style type="text/css">
+        body{
+            margin: 0px;
+            padding: 0px;
+        }
+        .contentWrap{
+            padding-top: 0.5em;
+            margin: 0.5em;
+            border: 1px solid #000;
+            text-align: center;
+        }
+        #video1{
+            width: 100%;
+        }
+        #canvas1{
+            width: 100%;
+        }
+    </style>    
 </head>    
 <body>    
-    <input id="button111" type="button" title="开启摄像头" value="开启摄像头" onclick="getMedia();" /><br />    
-    <video height="120px" autoplay="autoplay"></video><hr />    
-    <input type="button" title="拍照" value="拍照" onclick="getPhoto();" /><br />    
-    <canvas id="canvas1" height="120px" ></canvas><hr />    
-    <input type="button" title="视频" value="视频" onclick="getVedio();" /><br />    
-    <canvas id="canvas2" height="120px"></canvas>    
+    <div class="contentWrap">
+        <input id="button111" type="button" title="开启摄像头" value="开启摄像头" onclick="getMedia();" /><br />    
+        <video id="video1" height="120px" autoplay="autoplay"></video><hr />    
+        <input type="button" title="拍照" value="拍照" onclick="getPhoto();" /><br />    
+        <canvas id="canvas1" height="120px" ></canvas>  
+    </div>   
     
     <script type="text/javascript">    
         var video = document.querySelector('video');    
@@ -19,9 +37,6 @@
     
         var canvas1 = document.getElementById('canvas1');    
         var context1 = canvas1.getContext('2d');    
-    
-        var canvas2 = document.getElementById('canvas2');    
-        var context2 = canvas2.getContext('2d');    
     
         navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
         window.URL = window.URL || window.webkitURL || window.mozURL || window.msURL;    
@@ -31,7 +46,6 @@
         MediaStreamTrack.getSources(function (sourceInfos) {    
             for (var i = 0; i != sourceInfos.length; ++i) {    
                 var sourceInfo = sourceInfos[i];    
-                //这里会遍历audio,video，所以要加以区分    
                 if (sourceInfo.kind === 'video') {    
                     exArray.push(sourceInfo.id);    
                 }    
@@ -65,14 +79,7 @@
             }    
     
             //video.play();    
-    
-            // 音频    
-            audio = new Audio();    
-            audioType = getAudioType(audio);    
-            if (audioType) {    
-                audio.src = 'polaroid.' + audioType;    
-                audio.play();    
-            }    
+       
         }    
         function errorFunc(e) {    
             alert('Error！'+e);    
@@ -84,28 +91,11 @@
             window.setInterval(function () {    
                 context.drawImage(video, 0, 0,90,120);    
             }, 60);    
-        }    
-    
-        //获取音频格式    
-        function getAudioType(element) {    
-            if (element.canPlayType) {    
-                if (element.canPlayType('audio/mp4; codecs="mp4a.40.5"') !== '') {    
-                    return ('aac');    
-                } else if (element.canPlayType('audio/ogg; codecs="vorbis"') !== '') {    
-                    return ("ogg");    
-                }    
-            }    
-            return false;    
-        }    
+        }     
     
         //拍照    
         function getPhoto() {    
             context1.drawImage(video, 0, 0,90,120); //将video对象内指定的区域捕捉绘制到画布上指定的区域，实现拍照。    
-        }    
-    
-        //视频    
-        function getVedio() {    
-            drawVideoAtCanvas(video, context2);    
         }    
     
     </script>    
