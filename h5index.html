@@ -23,8 +23,7 @@
         var canvas2 = document.getElementById('canvas2');    
         var context2 = canvas2.getContext('2d');    
     
-        var getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
-        // navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
+        navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
         window.URL = window.URL || window.webkitURL || window.mozURL || window.msURL;    
     
         var exArray = []; //存储设备源ID    
@@ -40,8 +39,8 @@
         });    
           
         function getMedia() {    
-            if (getUserMedia) {    
-                getUserMedia({    
+            if (navigator.getUserMedia) {    
+                navigator.getUserMedia({    
                     'video': {    
                         'optional': [{    
                             'sourceId': exArray[0] //0为前置摄像头，1为后置    
@@ -51,7 +50,7 @@
                 }, successFunc, errorFunc);    //success是获取成功的回调函数    
             }    
             else {    
-                alert('此设备不兼容摄像头获取');    
+                alert('此设备不兼容');    
             }    
         }    
     
