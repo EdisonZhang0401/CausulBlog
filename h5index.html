@@ -1,7 +1,7 @@
 <!DOCTYPE html>    
 <html xmlns="http://www.w3.org/1999/xhtml">    
 <head>    
-    <title>HTML5 GetUserMedia Demo</title>    
+    <title>HTML5相机</title>    
     <meta charset="utf-8"/>  
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
     <style type="text/css">
@@ -73,8 +73,7 @@
     
         function successFunc(stream) {    
             //alert('Succeed to get media!');    
-            if (video.mozSrcObject !== undefined) {    
-                //Firefox中，video.mozSrcObject最初为null，而不是未定义的，我们可以靠这个来检测Firefox的支持    
+            if (video.mozSrcObject !== undefined) {   
                 video.mozSrcObject = stream;   
             }    
             else {    
@@ -89,7 +88,7 @@
         }    
     
             
-        // 将视频帧绘制到Canvas对象上,Canvas每60ms切换帧，形成肉眼视频效果    
+        // 将视频帧绘制到Canvas对象上
         function drawVideoAtCanvas(video,context) {    
             window.setInterval(function () {    
                 context.drawImage(video, 0, 0,90,120);    
@@ -98,7 +97,7 @@
     
         //拍照    
         function getPhoto() {    
-            context1.drawImage(video, 0, 0,90,120); //将video对象内指定的区域捕捉绘制到画布上指定的区域，实现拍照。    
+            context1.drawImage(video, 0, 0,90,120);  
         }    
     
     </script>    
