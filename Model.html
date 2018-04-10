@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Model Load</title>
+    <script src="JS/stats.js"></script>
+    <script src="JS/three.js"></script>
+    <script src="JS/Tween.js"></script>
+    <script src="JS/OBJLoader.js"></script>
+    <script src="JS/MTLLoader.js"></script>
+    <script src="JS/DDSLoader.js"></script>
+    <script src="JS/dat.gui.js"></script>
+    <script src="JS/TrackballControls.js"></script>
+    <style>
+        body{
+            margin: 0px;
+            padding:0px;
+        }
+        #canvas{
+            width: 100%;
+            border: none;
+            cursor: pointer;
+            height: 900px;
+            background-color: #EEEEEE;
+        }
+    </style>
+</head>
+<script>
+    window.onload = function () {
+        threeStart();
+    }
+
+    var three ={
+        renderer:"",
+        stats:"",
+        camera:"",
+        scence:"",
+        light:"",
+        mesh:"",
+        controls:"",
+        //renderer渲染器建立
+        initThree:function () {
+            width = document.getElementById('canvas').clientWidth;
+            height = document.getElementById('canvas').clientHeight;
+            renderer = new THREE.WebGLRenderer({
+                antialias : true
+            });
+            renderer.setSize(width, height);//渲染器宽高
+            renderer.shadowMapEnabled = true; //显示阴影
+
+            document.getElementById('canvas').appendChild(renderer.domElement);
+            renderer.setClearColor(0xFFFFFF, 1.0);
+
+            stats = new Stats();//性能测试
+            stats.domElement.style.position = 'absolute';
+            stats.domElement.style.left = '0px';
+            stats.domElement.style.top = '0px';
+            document.getElementById('canvas').appendChild(stats.domElement);
+        },
+        //Camera摄像机建立
+        initCamera:function () {
+            camera = new THREE.PerspectiveCamera(45, width / height, 1, 10000);
+            camera.position.x = 100;
+            camera.position.y = 300;
+            camera.position.z = 600;
+            camera.up.x = 0;
+            camera.up.y = 1;
+            camera.up.z = 0;
+            camera.lookAt(0,0,0);
+
+            //镜头控制
+            controls = new THREE.TrackballControls( camera );
+
+            controls.rotateSpeed = 5.0;
+            controls.zoomSpeed = 5;
+            controls.panSpeed = 2;
+
+            controls.noZoom = false;
+            controls.noPan = false;
+
+            controls.staticMoving = false;
+            controls.dynamicDampingFactor = 0.3;
+        },
+        //Scene场景建立
+        initScene:function () {
+            scene = new THREE.Scene();
+        },
+        //Light光源建立
+        initLight:function () {
+            // light = new THREE.AmbientLight(0xFFFFFF);
+            // light.position.set(100, 100, 200);
+            // scene.add(light);
+
+            var ambientLight = new THREE.AmbientLight( 0xcccccc, 0.4 );
+            scene.add( ambientLight );
+
+            var pointLight = new THREE.PointLight( 0xffffff, 0.8 );
+            camera.add( pointLight );
+            scene.add( camera );
+        },
+        //物体建立 添加入场景
+        initObject:function () {
+            createFish();
+        },
+        //辅助线
+        initGrid:function () {
+            var helper = new THREE.GridHelper( 1000, 50 );
+            scene.add( helper );
+        },
+        // 帧循环、游戏循环
+        animation:function () {
+            //mesh.rotation.y +=0.01;
+            //mesh.rotation.x +=0.01;
+            renderer.render(scene, camera);
+            requestAnimationFrame(three.animation);
+            controls.update();
+            stats.update();
+
+        }
+
+    }
+
+    //模型调用
+    function createFish() {
+
+        //var materialNormal = new THREE.MeshBasicMaterial({color: 0x00ff00});
+
+        var onProgress = function ( xhr ) {
+            if ( xhr.lengthComputable ) {
+                var percentComplete = xhr.loaded / xhr.total * 100;
+            }
+        };
+
+        var onError = function ( xhr ) { };
+
+        THREE.Loader.Handlers.add( /\.dds$/i, new THREE.DDSLoader() );
+
+        var mtlLoader = new THREE.MTLLoader();
+
+        mtlLoader.setBaseUrl('models/obj/car/');
+        mtlLoader.setPath('models/obj/car/');
+        mtlLoader.load( 'obj.mtl', function( materials ) {
+            materials.preload();
+
+            var objLoader = new THREE.OBJLoader();
+            objLoader.setMaterials( materials );
+            objLoader.setPath('models/obj/car/');
+            objLoader.load('obj.obj', function ( object ) {
+                object.scale.set(3, 3, 3);
+                scene.add( object );
+                console.log(object);
+
+            }, onProgress, onError );
+
+        });
+
+
+        // 纹理获取textures
+        var textureLoader = new THREE.TextureLoader();
+
+
+    }
+    //正方形，模型创建
+    function createCube() {
+        var geometry = new THREE.BoxGeometry( 100, 100, 100 );
+
+        for ( var i = 0; i < geometry.faces.length; i += 2 ) {
+            
+            var hex = Math.random() * 0xffffff;
+            geometry.faces[ i ].color.setHex( hex );
+            geometry.faces[ i + 1 ].color.setHex( hex );
+
+        }
+
+        var material = new THREE.MeshBasicMaterial( { vertexColors: THREE.FaceColors} );
+        mesh = new THREE.Mesh( geometry,material);
+        mesh.position = new THREE.Vector3(0,0,0);
+        mesh.castShadow = true;
+        scene.add(mesh);
+    }
+    
+    function guiGet() {
+        var controls = new function() {
+            this.rotationSpeed = 0.02;
+            this.bouncingSpeed = 0.03;
+        };
+        var gui = new dat.GUI();
+        gui.add(controls,'rotationSpeed',0,0.5);
+        gui.add(controls,'bouncingSpeed',0,0.5);
+    }
+
+    //调用函数
+    function threeStart() {
+        three.initThree();
+        three.initCamera();
+        three.initScene();
+        three.initLight();
+
+        three.initObject();
+        three.initGrid();
+
+        three.animation();
+
+    }
+
+
+</script>
+<body>
+<div id="canvas"></div>
+</body>
+</html>
