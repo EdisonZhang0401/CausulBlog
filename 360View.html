@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>360View</title>
+    <link rel="stylesheet" href="JS/photo-sphere-viewer.min.css">
+
+    <script src="JS/360view/three.min.js"></script>
+    <script src="JS/360view/D.min.js"></script>
+    <script src="JS/360view/uevent.min.js"></script>
+    <script src="JS/360view/doT.min.js"></script>
+    <script src="JS/360view/photo-sphere-viewer.min.js"></script>
+</head>
+<style>
+    #box{
+        width: 100%;
+    }
+</style>
+<script>
+    window.onload = function () {
+        var container = document.getElementById("box");
+        var viewer = PhotoSphereViewer({
+            container: container,
+            panorama: 'images/big-bg.jpg',
+            // 可选，默认值null，全景图容器的最终尺寸。例如：{width: 500, height: 300}。
+            size: {
+                width: '100%',
+                height: '900px',
+            },
+
+            markers: [
+                {
+                    // image marker that opens the panel when clicked
+                    id: 'image',
+                    longitude: 0.17,
+                    latitude: -0.05 ,
+                    image: 'images/icon1.png',
+                    width: 180,
+                    height: 43,
+                    anchor: 'bottom center',
+                    tooltip: 'A image marker. <b>Click me!</b>',
+                    content: '123',
+                },
+                // {
+                //     // html marker with custom style
+                //     id: 'text',
+                //     longitude: 0,
+                //     latitude: 0,
+                //     html: 'HTML <b>marker</b> &hearts;',
+                //     anchor: 'bottom right',
+                //     scale: [0.5, 1.5],
+                //     style: {
+                //         maxWidth: '100px',
+                //         color: 'white',
+                //         fontSize: '20px',
+                //         fontFamily: 'Helvetica, sans-serif',
+                //         textAlign: 'center'
+                //     },
+                //     tooltip: {
+                //         content: 'An HTML marker',
+                //         position: 'right'
+                //     }
+                // },
+                // {
+                //     // polygon marker
+                //     id: 'polygon',
+                //     polygon_px: [
+                //         [3184, 794], [3268, 841], [3367, 1194],
+                //         [3327, 1307], [3065, 1221], [3097, 847]
+                //     ],
+                //     svgStyle: {
+                //         fill: 'rgba(200, 0, 0, 0.2)',
+                //         stroke: 'rgba(200, 0, 50, 0.8)',
+                //         'stroke-width': '2px'
+                //     },
+                //     tooltip: {
+                //         content: 'A dynamic polygon marker',
+                //         position: 'right bottom'
+                //     }
+                // },
+                // {
+                //     // polyline marker
+                //     id: 'polyline',
+                //     polyline_rad: [
+                //         [5.924, 0.064], [5.859, -0.061], [5.710, -0.132],
+                //         [5.410, -0.287], [4.329, -0.490], [3.838, -0.370], [3.725, -0.241]
+                //     ],
+                //     svgStyle: {
+                //         stroke: 'rgba(140, 190, 10, 0.8)',
+                //         'stroke-linecap': 'round',
+                //         'stroke-linejoin': 'round',
+                //         'stroke-width': '10px'
+                //     },
+                //     tooltip: 'A dynamic polyline marker'
+                // },
+                {
+                    // html marker with custom style
+                    id: 'text',
+                    longitude: 0,
+                    latitude: 0,
+                    html: '<b>这里是一段html</b> &hearts;',
+                    anchor: 'bottom right',
+                    scale: [0.5, 1.5],
+                    style: {
+                        maxWidth: '100px',
+                        color: 'white',
+                        fontSize: '20px',
+                        fontFamily: 'Helvetica, sans-serif',
+                        textAlign: 'center'
+                    },
+                    tooltip: {
+                        content: 'An HTML marker',
+                        position: 'right'
+                    }
+                },
+                {
+                    // html marker with custom style
+                    id: 'text2',
+                    longitude: -5.35,
+                    latitude: -0.15,
+                    html: '<b>这是一个士兵</b>;',
+                    anchor: 'bottom right',
+                    scale: [1, 1],
+                    style: {
+                        maxWidth: '130px',
+                        color: 'red',
+                        fontSize: '20px',
+                        fontFamily: 'Helvetica, sans-serif',
+                        textAlign: 'center'
+                    },
+                    tooltip: {
+                        content: 'An HTML marker',
+                        position: 'right'
+                    }
+                },
+                {
+                    // circle marker
+                    id: 'circle',
+                    circle: 120,
+                    x: 200,
+                    y: 0,
+                    tooltip: 'A circle marker'
+                }
+            ]
+
+        });
+    }
+</script>
+<body>
+<div id="box"></div>
+</body>
+</html>
