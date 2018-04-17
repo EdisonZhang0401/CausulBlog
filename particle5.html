@@ -110,19 +110,19 @@
 
             stats.update();
             step += 0.01;
-            var vertices = group.geometry.vertices;
-            vertices.forEach(function (v) {
-                vertices.rotation.x = step;
-
-                // if (v.y <= 0){ v.y = 60};
-                // if (v.x <= -20 || v.x >= 20){
-                //     v.velocityX = v.velocityX * -1
-                //     v.velocityY = v.velocityY * 1.1
-                // };
-            });
+            // var vertices = group.geometry.vertices;
+            // vertices.forEach(function (v) {
+            //     vertices.rotation.x = step;
+            //
+            //     // if (v.y <= 0){ v.y = 60};
+            //     // if (v.x <= -20 || v.x >= 20){
+            //     //     v.velocityX = v.velocityX * -1
+            //     //     v.velocityY = v.velocityY * 1.1
+            //     // };
+            // });
 
             // step += 0.01;
-            // group.rotation.x = step;
+            group.rotation.x = step;
 
             requestAnimationFrame(render);
             webGLRenderer.render(scene, camera);
