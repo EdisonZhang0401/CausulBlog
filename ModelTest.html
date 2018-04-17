@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Model Load</title>
+    <script src="JS/stats.js"></script>
+    <script src="JS/three.js"></script>
+    <script src="JS/Tween.js"></script>
+    <script src="JS/OBJLoader.js"></script>
+    <script src="JS/MTLLoader.js"></script>
+    <script src="JS/DDSLoader.js"></script>
+    <script src="JS/dat.gui.js"></script>
+    <script type="text/javascript" src="JS/OrbitControls.js"></script>
+    <style>
+        body{
+            margin: 0px;
+            padding:0px;
+        }
+        #canvas{
+            width: 100%;
+            border: none;
+            cursor: pointer;
+            background-color: #EEEEEE;
+        }
+    </style>
+</head>
+<script>
+    window.onload = function () {
+        threeStart();
+    }
+
+    var meshMaterial;
+    var cloud;
+    var step = 0;
+
+    var three ={
+        renderer:"",
+        stats:"",
+        camera:"",
+        scence:"",
+        light:"",
+        mesh:"",
+        controls:"",
+        //renderer渲染器建立
+        initThree:function () {
+            width = document.getElementById('canvas').clientWidth;
+            height = window.innerHeight;
+            renderer = new THREE.WebGLRenderer({
+                antialias : true
+            });
+            renderer.setSize(width, height);//渲染器宽高
+            renderer.shadowMapEnabled = true; //显示阴影
+
+            document.getElementById('canvas').appendChild(renderer.domElement);
+            renderer.setClearColor(0x000000, 1.0);
+
+            stats = new Stats();//性能测试
+            stats.domElement.style.position = 'absolute';
+            stats.domElement.style.left = '0px';
+            stats.domElement.style.top = '0px';
+            document.getElementById('canvas').appendChild(stats.domElement);
+        },
+        //Camera摄像机建立
+        initCamera:function () {
+            camera = new THREE.PerspectiveCamera(45, width / height, 1, 10000);
+            camera.position.x = 100;
+            camera.position.y = 300;
+            camera.position.z = 600;
+            camera.up.x = 0;
+            camera.up.y = 1;
+            camera.up.z = 0;
+
+            var target = new THREE.Vector3(0, 0 , 0);
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.target = target;
+            camera.lookAt(target);
+
+        },
+        //Scene场景建立
+        initScene:function () {
+            scene = new THREE.Scene();
+        },
+        //Light光源建立
+        initLight:function () {
+            // light = new THREE.AmbientLight(0xFFFFFF);
+            // light.position.set(100, 100, 200);
+            // scene.add(light);
+
+            var ambientLight = new THREE.AmbientLight( 0xcccccc, 0.4 );
+            scene.add( ambientLight );
+
+            var pointLight = new THREE.PointLight( 0xffffff, 0.8 );
+            camera.add( pointLight );
+            scene.add( camera );
+        },
+        //物体建立 添加入场景
+        initObject:function () {
+            createFish("models/obj/head/","kulou.obj");
+        },
+        // //辅助线
+        // initGrid:function () {
+        //     var helper = new THREE.GridHelper( 1000, 50 );
+        //     scene.add( helper );
+        // },
+        // 帧循环、游戏循环
+        animation:function () {
+            //mesh.rotation.y +=0.01;
+            //mesh.rotation.x +=0.01;
+            step += 0.01;
+
+            cloud.rotation.x = step;
+            renderer.render(scene, camera);
+            requestAnimationFrame(three.animation);
+            stats.update();
+        }
+
+    }
+
+    //模型调用
+    function createFish(url,obj) {
+
+        //var materialNormal = new THREE.MeshBasicMaterial({color: 0x00ff00});
+       // var mtlLoader = new THREE.MTLLoader();
+
+        meshMaterial = new THREE.MeshPhongMaterial({color: 0xffffff, transparent: false, opacity: 1.0});
+
+        var objLoader = new THREE.OBJLoader();
+            objLoader.setPath(url);
+            objLoader.load(obj, function ( object ) {
+                var geometry = object.children[ 0 ].geometry;
+                geometry.attributes.uv2 = geometry.attributes.uv;
+                geometry.center();
+                mesh = new THREE.Mesh( geometry, meshMaterial );
+                mesh.scale.multiplyScalar( 10 );
+                scene.add( mesh );
+            })
+
+    }
+
+    //粒子创建`
+    function createPointCloud(size, transparent, opacity, sizeAttenuation, color) {
+
+        var geom = new THREE.Geometry();
+
+
+        var material = new THREE.PointCloudMaterial({
+            size: 3,
+            transparent: false,
+            opacity: 0,
+            sizeAttenuation: true,
+            color: new THREE.Color(0xfcd880)
+        });
+
+
+        var range = 200;
+        for (var i = 0; i < 400; i++) {
+
+            var particle = new THREE.Vector3(Math.random() * range - range / 2, Math.random() * range - range / 2, Math.random() * range - range / 2);
+            particle.velocityY = 0.1 + Math.random() / 5;
+            particle.velocityX = (Math.random() - 0.5) / 3;
+            particle.velocityZ = (Math.random() - 0.5) / 3;
+            geom.vertices.push(particle);
+        }
+
+        cloud = new THREE.PointCloud(geom, material);
+        cloud.name = 'pointcloud';
+        cloud.sortParticles = true;
+        scene.add(cloud);
+    }
+
+    //粒子材质调用
+    function getTexture() {
+        //no
+    }
+
+    //正方形，模型创建
+    function createCube() {
+        var geometry = new THREE.BoxGeometry( 100, 100, 100 );
+
+        for ( var i = 0; i < geometry.faces.length; i += 2 ) {
+            
+            var hex = Math.random() * 0xffffff;
+            geometry.faces[ i ].color.setHex( hex );
+            geometry.faces[ i + 1 ].color.setHex( hex );
+
+        }
+
+        var material = new THREE.MeshBasicMaterial( { vertexColors: THREE.FaceColors} );
+        mesh = new THREE.Mesh( geometry,material);
+        mesh.position = new THREE.Vector3(0,0,0);
+        mesh.castShadow = true;
+        scene.add(mesh);
+    }
+    
+    function guiGet() {
+        var guiParams = new function() {
+            this.rotationSpeed = 0.02;
+            this.opacity = meshMaterial.opacity;
+            this.transparent = meshMaterial.transparent;
+            this.visible = meshMaterial.visible;
+            this.ambient = '#ffffff';
+            this.emissive = '#160f00';
+            this.specular = '#ffffff';
+            this.shininess = 5;
+            this.side = 'front';
+            this.color = '#B8860B';
+            this.selectedMesh = 'sphere';
+            this.spotLight = true;
+            this.redraw = function () {
+                if (scene.getObjectByName("pointcloud")) {
+                    scene.remove(scene.getObjectByName("pointcloud"));
+                }
+                createPointCloud();
+            };
+
+            this.updateMaterial = function() {
+                meshMaterial.opacity = this.opacity;
+                meshMaterial.transparent = this.transparent;
+                meshMaterial.visible = this.visible;
+                meshMaterial.ambient = new THREE.Color(this.ambient);
+                meshMaterial.emissive = new THREE.Color(this.emissive);
+                meshMaterial.specular = new THREE.Color(this.specular);
+                meshMaterial.shininess = this.shininess;
+                meshMaterial.color = new THREE.Color(this.color);
+                switch (this.side) {
+                    case "front":
+                        meshMaterial.side = THREE.FrontSide;
+                        break;
+                    case "back":
+                        meshMaterial.side = THREE.BackSide;
+                        break;
+                    case "double":
+                        meshMaterial.side = THREE.DoubleSide;
+                        break;
+                }
+                meshMaterial.needsUpdate = true;
+            }
+        };
+        var gui = new dat.GUI();
+        var folder = gui.addFolder('Mesh');
+        folder.open();
+        folder.add(guiParams, 'opacity', 0.1, 1.0).onChange(function(e) {
+            guiParams.updateMaterial();
+        });
+        folder.add(guiParams, 'transparent').onChange(function(e) {
+            guiParams.updateMaterial();
+        });
+        folder.addColor(guiParams, 'ambient').onChange(function(e) {
+            guiParams.updateMaterial();
+        });
+        folder.addColor(guiParams, 'emissive').onChange(function(e) {
+            guiParams.updateMaterial();
+        });
+        folder.addColor(guiParams, 'specular').onChange(function(e) {
+            guiParams.updateMaterial();
+        });
+        folder.add(guiParams, 'shininess', 1, 200).onChange(function(e) {
+            guiParams.updateMaterial();
+        });
+        folder.add(guiParams, 'visible').onChange(function(e) {
+            guiParams.updateMaterial();
+        });
+        folder.add(guiParams, 'side', ['front', 'back', 'double']).onChange(function(e) {
+            console.log(e);
+            guiParams.updateMaterial();
+        });
+        folder.addColor(guiParams, 'color').onChange(function(e) {
+            guiParams.updateMaterial();
+        });
+        gui.add(guiParams, 'spotLight').onChange(function(e) {
+            scene.remove(spotLight);
+            scene.remove(cameraHelper);
+            if (e) {
+                scene.add(spotLight);
+                scene.add(cameraHelper);
+            }
+        });
+
+        guiParams.updateMaterial();
+        guiParams.redraw();
+    }
+
+    //调用函数
+    function threeStart() {
+        three.initThree();
+        three.initCamera();
+        three.initScene();
+        three.initLight();
+
+        three.initObject();
+        // three.initGrid();
+        guiGet();
+        // createPointCloud();
+        three.animation();
+
+    }
+
+
+</script>
+<body>
+<div id="canvas"></div>
+</body>
+</html>
