@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <!-- 为移动设备添加 viewport -->
+    <meta name="viewport" content="width=device-width , initial-scale=1 , maximum-scale=1 , user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="white"/>
+    <meta name="format-detection" content="telphone=no, email=no"/>
+    <title>video</title>
+    <link rel="stylesheet" href="css/comm.css">
+    <script src="js/jquery.js"></script>
+    <script src="js/comm.js"></script>
+    <!--在页面中引入 WebRTCAPI.min.js-->
+    <script src="https://sqimg.qq.com/expert_qq/webrtc/2.2/WebRTCAPI.min.js"></script>
+    <script src="js/workgroup.js"></script>
+    <!--<script src="js/stomp.js"></script>-->
+    <script>
+//        $(function(){
+//            initWebsocket();
+            //参数设置
+            var sosId = 51;
+            var token = '3afb5a0c88024d17bce70362eb4bfbcf';///用户的token
+            var sdkAppId = 1400084584;
+            var openid = 'EMERGENT_CONTACTER-5';//腾讯直播和IM的账号id
+            var userSig = 'eJxFkMtugzAQRf*FdR824OBUyiI8SiMwJJRK7cpCwcA0ASwwVVCVfy9BRN2ec0d3Zn61NHx-yqSEnGeKG12uvWhIe5ixuEjoBM8KJboJ62StI3SXP6LroW1uHGGCdQOhfwm5aBQUMM95zEt8L0q5E0fp1km95JEsuR7KKcC8g7PzQbS1i2ui3OT5y4krP4xY8*GfhVsJZpNysFRxQlUvxy3YIx3edt-IJGXjW5dVEdC9C*w1Ks3AspOg1XG4j6308xweNpt7WX7i86VTJTanZalJqLlIBbW4caITSoz1ylh4djy2Q6O4GqWYX3P9A8ELWls_';
+            var accountType = 25487;
+            var currentLiveUserId = null;
+//            var role = "EMERGENT_CONTACTER";//连接websocket的角色
+            var roomId = null;
+            var wsUrl = 'wss://gz2.qa.super999.cn/ws'//连接websocket的地址
+            var videoRoomId = 51;//视频房间id
+            var imChatRoomId='c54266bcc0624863a85ccfd9b832eb19';//即时通讯聊天房间id
+
+
+//            // 初始化
+////            var RTC = new WebRTCAPI({
+////                "userId": sosId,
+////                "userSig": userSig,
+////                "privateMapKey":123,
+////                "sdkAppId":  sdkAppId,
+////                "accountType":  accountType,
+////                "preconn": 0,
+////                "closeLocalMedia": false
+////            });
+//
+//            var RTC = new WebRTCAPI( {
+//                "userId": sosId,
+//                "sdkAppId":  sdkAppId,
+//                "accountType":  accountType,
+//                "privateMapKey":token,
+//                "userSig": userSig,
+//                "closeLocalMedia": true
+//            },function(){
+//                //进入房间
+//                RTC.createRoom({
+//                    roomid : videoRoomId,
+//                    role : "user"
+//                });
+//            },function(error){
+//                console.error( error )
+//            } );
+//
+//
+////            // 创建或进入房间
+////            RTC.createRoom({
+////                roomid : 52,
+////                role : "user"   //画面设定的配置集名 （见控制台 - 画面设定 )
+////            });
+//
+//            //本地流 新增
+//            RTC.on("onLocalStreamAdd", function(data){
+//                if( data && data.stream){
+//                    document.querySelector("#localVideoMedia").srcObject = data.stream;
+//                }
+//            });
+//
+//            //远端流 新增/更新
+//            RTC.on("onRemoteStreamUpdate", function(data){
+//                if( data && data.stream){
+//                    document.querySelector("#remoteVideoMedia").srcObject = data.stream;
+//                }
+//            });
+//        })
+            var sosId = 51;
+            var token = '3afb5a0c88024d17bce70362eb4bfbcf';
+            var currentLiveUserId = null;
+            var role = "EMERGENT_CONTACTER";//连接websocket的角色
+            var roomId = null;
+            var wsUrl = 'wss://gz2.qa.super999.cn/ws'
+            var rtcConfig = {
+                sdkAppId:1400084584,
+                openid:'EMERGENT_CONTACTER-5',
+                userSig:'eJxFkMtugzAQRf*FbV82wanTHUVUJbS84kRhZblgiNWAwTgRJeq-lyCibs*Z0Z25F4N8bB5Z04icMk0XKjdeDGDcT5j3jVCcskJzNWITrUwAbvLMVSdkfeUAImguAPiXIue1FoWY9t6SMCA0jNzEJmHygOaZTpSj-HRTx4sdOwx80Xok4JFs44CVSh7Xrp*RnRMch8MXHsoo23e9A23vYPtRtUzltt08JapfbfWQF3pN2PK9P9lV2p9j8Grhzsriu-IWln-T6csxElrjodhC2JqlFhW-cmQijOEzgjNnWSZPtab6p*FTLb9-aOhbdw__',
+                accountType:25487,
+                localVideoId:'myVideoView',
+                remoteVideoContainerId:'videoContainer',
+                closeLocalMedia:true
+            };
+
+            var rtc = null;
+
+
+            $(function () {
+                initWebsocket();
+            });
+
+
+            function initWebsocket() {
+                WorkGroup.connect(wsUrl,token,role,function () {
+                    updateStatus("websocket链接成功");
+                    WorkGroup.registerGlobalSos(onNewSosCome);
+                    WorkGroup.registerSosRoom(onSosRoomCome);
+                    WorkGroup.sync();
+                },function () {
+                    alert("链接失败，请刷新页面");
+                });
+            }
+
+
+            function onNewSosCome(sos) {
+                console.log("收到sos呼救");
+                console.log(JSON.stringify(sos));
+                updateStatus("收到呼救信息");
+                if(sosId == sos.id)
+                {
+                    WorkGroup.unRegisterGlobalSos();
+                    WorkGroup.acceptSos(sosId);
+                }
+            }
+
+
+            var hasJoin = false;
+            function onSosRoomCome(chatRoom) {
+                updateStatus("收到房间信息");
+                console.log(JSON.stringify(chatRoom));
+                if(chatRoom.sosId == sosId && !hasJoin){
+                    WorkGroup.unRegisterSosRoom();
+                    roomId = chatRoom.id;
+                    currentLiveUserId = chatRoom.videoUser;
+                    hasJoin = true;
+                    initRTC();
+                    sendText();
+                }
+            }
+
+            function initRTC() {
+
+                updateStatus("正在初始化视频参数...");
+
+                rtc = new WebRTCAPI({
+                    "openid": rtcConfig.openid,
+                    "preconn": 0,
+                    "sdkAppId":  rtcConfig.sdkAppId,
+                    "accountType":  rtcConfig.accountType,
+                    "userSig": rtcConfig.userSig,
+                    "closeLocalMedia": false
+                },function () {
+                    updateStatus("初始化成功");
+                    joinRoom();
+
+                },function () {
+                    updateStatus("初始化失败");
+                });
+
+            }
+
+
+            function sendText() {
+//                var msg = $("#msgInput").val();
+                var msg = "123";
+                RTCRoom.sendRoomTextMsg({
+                    data:{
+                        msg:msg
+                    }
+                });
+            }
+
+
+            function updateRemoteViews(pusher) {
+
+                if( !pusher || !pusher.stream){
+                    console.log("没有推流地址");
+                    return;
+                }
+
+                var videoContainer = $("#videoContainer");
+
+                var userId = pusher.openId;//视频流所属用户的openId（ identifier ）
+                var stream = pusher.stream;//视频流 Stream，可能为 null( 每一个用户进来 不管是否推流，都会触发这个回调)
+                var videoId = pusher.videoId;//视频流Stream的唯一id ,由 tinyid + "_" + 由随机字符串 组成
+                var videoType = pusher.videoType; //0 : NONE , 1:AUDIO 音频, 2：主路 MAIN 7：辅路 AID
+
+
+                var frameId = "player_frame_"+userId;
+                var videoFrame = $("#"+frameId);
+
+                if(videoFrame.length <= 0){
+                    videoFrame = $("#videoFrameTeplate").clone();
+                    videoFrame.attr("id",frameId);
+                    videoFrame.removeClass("d-none");
+                    videoFrame.find(".card-header").text(userId);
+
+                    if(currentLiveUserId == userId){
+                        //主屏
+                        videoFrame.find(".btn-change-live").text("主屏幕");
+                    }
+                    videoFrame.find(".btn-change-live").data("video-user",userId);
+//                videoFrame.find(".btn-change-live").attr("data-video-url",stream);
+                    videoFrame.find(".btn-mute").data("video-user",userId);
+//                videoFrame.find(".btn-mute").attr("data-video-url",stream);
+
+                    videoContainer.append(videoFrame);
+                }
+
+
+                var video = videoFrame.find(".video").get(0);
+                video.srcObject = pusher.stream;
+            }
+
+
+            function removeRemoteViews(pusher) {
+                var userId = pusher.openId;//视频流所属用户的openId（ identifier ）
+                var stream = pusher.stream;//视频流 Stream，可能为 null( 每一个用户进来 不管是否推流，都会触发这个回调)
+                var videoId = pusher.videoId;//视频流Stream的唯一id ,由 tinyid + "_" + 由随机字符串 组成
+                var videoType = pusher.videoType; //0 : NONE , 1:AUDIO 音频, 2：主路 MAIN 7：辅路 AID
+                var frameId = "player_frame_"+userId;
+                $("#"+frameId).remove();
+            }
+
+
+
+            function joinRoom() {
+                updateStatus("准备加入房间");
+                // 创建或进入房间
+
+                console.log("设置rtc监听");
+                //本地流 新增
+                rtc.on("onLocalStreamAdd", function(data){
+                    console.log("本地视频添加成功 "+JSON.stringify(data));
+                    if( data && data.stream){
+                        document.getElementById("localVideoMedia").srcObject = data.stream;
+                        var btns = $("#localVideoMedia").next();
+                        btns.find(".btn-change-live").data("video-user",rtcConfig.openid);
+                        btns.find(".btn-mute").data("video-user",rtcConfig.openid);
+
+                        if(currentLiveUserId == rtcConfig.openid){
+                            //主屏
+                            btns.find(".btn-change-live").text("主屏幕");
+                        }
+                    }
+                });
+
+                //远端流 新增/更新
+                rtc.on("onRemoteStreamUpdate", function(data){
+                    console.log("远端视频更新");
+                    console.log("onRemoteStreamUpdate "+JSON.stringify(data));
+                    updateRemoteViews(data);
+                });
+
+                //远端流 新增/更新
+                rtc.on("onRemoteStreamRemove", function(data){
+                    console.log("远端视频删除");
+                    console.log("onRemoteStreamRemove "+JSON.stringify(data));
+                    removeRemoteViews(data);
+                });
+
+                //远端流关闭
+                rtc.on("onWebSocketClose", function(){
+                    console.log("直播房间websocket断开");
+                });
+
+                console.log("设置rtc监听完成");
+
+                rtc.createRoom({
+                    roomid:roomId,
+                    role:"user"
+                },function () {
+                    updateStatus("加入房间成功");
+//                rtc.startRTC();
+
+                },function () {
+                    updateStatus("加入房间失败");
+                });
+            }
+
+            function onChangeLive(widget) {
+//            var videoUrl = $(widget).data("video-url");
+                var videoUser = $(widget).data("video-user");
+                WorkGroup.changeLiveSource(sosId,null,videoUser);
+                currentLiveUserId = videoUser;
+                $(".btn-change-live").text("设为主屏");
+                $(widget).text("主屏幕");
+            }
+
+
+            function onMute(widget) {
+                var video = $(widget).parent().prev().get(0);
+                var fas = $(widget).find(".fas");
+                if(video)
+                {
+                    var mute = video.muted;
+                    if(mute == null){
+                        mute = false;
+                    }
+
+                    mute = !mute;
+                    video.muted = mute;
+
+                    if(mute){
+                        fas.removeClass("fa-volume-up");
+                        fas.addClass("fa-volume-off");
+                    }else{
+                        fas.removeClass("fa-volume-off");
+                        fas.addClass("fa-volume-up");
+                    }
+                }
+            }
+
+            function exitRoom() {
+                RTCRoom.exitRoom({
+                    success:function () {
+                        console.log("退出房间成功");
+                    },
+                    fail:function () {
+                        console.log("退出房间失败");
+                    }
+                });
+            }
+
+            function updateStatus(msg) {
+                $("#status").append("<div>"+msg+"</div>");
+            }
+    </script>
+</head>
+<body>
+<!-- 音视频 -->
+<!--本地视频流
+    muted:本地视频流的video必须置为静音（muted)，否则会出现啸叫/回声等问题
+    Mac / iPhone / iPad 需要用js设置muted属性
+    autoplay：必须为激活状态
+    playsinline：保证在ios safari中不全屏播放
+ -->
+<video id="localVideoMedia" muted autoplay playsinline></video>
+<!-- 远端视频流 -->
+<video id="remoteVideoMedia" autoplay playsinline></video>
+
+<div class="talkBox">
+    <div class="talkBoxCenter">
+        <ul class="talkUl">
+            <li><div class="talkWrap"><span class="role role1">调度中心：</span><span class="talkText">现在情况如何了？</span></div></li>
+            <li><div class="talkWrap"><span class="role role2">急救员：</span><span class="talkText">现在情况如何了？</span></div></li>
+            <li><div class="talkWrap"><span class="role role2">社区医生：</span><span class="talkText">现在情况如何了？我带点药过来</span></div></li>
+            <li><div class="talkWrap"><span class="role role3">呼救者：</span><span class="talkText">现在情况如何了？</span></div></li>
+        </ul>
+        <input class="talkInput" type="text"/>
+    </div>
+</div>
+</body>
+</html>
+
+
+

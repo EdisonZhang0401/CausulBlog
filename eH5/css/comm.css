@@ -1,0 +1,144 @@
+@charset "utf-8";
+/*--！！注意！！------------------------------*/
+/*--此css是移动端使用，注意样式适应移动端-----*/
+/*--浏览器内核兼容如：------------------------*/
+/*---webkit-border-radius---------------------*/
+/*---moz-border-radius------------------------*/
+/*---border-radius----------------------------*/
+/*--参照设备width:360px;font-size:100px 等比缩放font-size--*/
+
+/*--样式重置以及清除浮动--*/
+html{font-size:100px;font-weight: 400;}
+body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,code,form,fieldset,legend,input,button,textarea,p,blockquote,th,td { margin:0; padding:0;font-weight: 400;}
+body,input,label,select,option,textarea,button,fieldset,legend,td,th,caption{ background-color:transparent;font-weight: 400;color:#3A3D40;font-size:14px;font-family:"Microsoft YaHei","PingFang SC",Helvetica,Roboto,Arial,sans-serif;}
+address, caption, cite, code, dfn, em, strong, th, var { font-style:normal; font-weight: 400;}
+a,button{color:#3A3D40;text-decoration:none; cursor: pointer;border: none;display: inline-block}
+a{vertical-align:top}
+img { border:none;vertical-align:top;}
+ol,ul,li { list-style:none; }
+input, textarea, select, button {outline: none;}
+table { border-collapse:collapse; }
+html {min-width: 100%;min-height: 100%;}
+.clearfix:after {content: "."; display: block; height:0; clear:both; visibility: hidden;}
+.clearfix { *zoom:1; }
+article,aside,dialog,footer,header,section,footer,nav,figure,menu{display:block}
+/*--样式重置end--*/
+.header{
+    font-size: 0.16rem;
+    font-weight: bolder;
+    color: #FFFFFF;
+    text-align: center;
+    padding: 0.16rem 0rem;
+    background-image: linear-gradient(90deg, #ffc940 0%, #ff690e 100%);
+    background-image: -moz-linear-gradient(90deg, #ffc940 0%, #ff690e 100%);
+    background-image: -o-linear-gradient(90deg, #ffc940 0%, #ff690e 100%);
+    background-image: -webkit-gradient(90deg, #ffc940 0%, #ff690e 100%);
+}
+.mainWrap{
+    padding:0.12rem;
+    text-align: center;
+}
+.main{
+    background-image: linear-gradient(135deg, #fffaeb 0%, #fff0e6 100%);
+    background-image: -moz-linear-gradient(135deg, #fffaeb 0%, #fff0e6 100%);
+    background-image: -o-linear-gradient(135deg, #fffaeb 0%, #fff0e6 100%);
+    background-image: -webkit-gradient(135deg, #fffaeb 0%, #fff0e6 100%);
+    border-radius: 0.04rem;
+    position: relative;
+    overflow: hidden;
+    padding: 0.18rem;
+    padding-top: 0.32rem;
+    text-align: left;
+}
+.tri{
+    transform:rotate(45deg);
+    -ms-transform:rotate(45deg); 	/* IE 9 */
+    -moz-transform:rotate(45deg); 	/* Firefox */
+    -webkit-transform:rotate(45deg); /* Safari 和 Chrome */
+    -o-transform:rotate(45deg); 	/* Opera */
+    position: absolute;
+    top: -0.47rem;
+    right: -0.11rem;
+}
+.triA{
+    width: 0;
+    height: 0;
+    border-width: 0.36rem;
+    border-style: solid;
+    border-color: transparent transparent #FFFFFF transparent;
+}
+.triB{
+    width: 0;
+    height: 0;
+    border-width: 0.36rem;
+    border-style: solid;
+    border-color: #ffe6ce transparent transparent transparent;
+}
+.mainUl li{
+    color:#999999;
+    font-size: 0.12rem;
+    margin-bottom: 0.14rem;
+    max-width: 2.65rem;
+}
+.confirmBtn{
+    color: #FFFFFF;
+    font-size: 0.16rem;
+    background-image: linear-gradient(90deg, #ffc940 0%, #ff690e 100%);
+    background-image: -moz-linear-gradient(90deg, #ffc940 0%, #ff690e 100%);
+    background-image: -o-linear-gradient(90deg, #ffc940 0%, #ff690e 100%);
+    background-image: -webkit-gradient(90deg, #ffc940 0%, #ff690e 100%);
+    padding: 0.12rem 0.3rem;
+    font-weight: bolder;
+    display: inline-block;
+    margin: 0 auto;
+    border-radius: 0.03rem;
+    margin-top: 0.4rem;
+}
+
+.talkBox{
+    padding: 0.12rem;
+    position: absolute;
+    bottom: 0rem;
+    z-index: 10;
+    font-size: 0.12rem;
+}
+.talkBox .talkUl{
+}
+.talkBox .talkUl li{
+    margin-bottom: 0.1rem;
+}
+.talkBox .talkUl li .talkWrap{
+    background: rgba(0,0,0,0.50);
+    border-radius: 100px;
+    padding: 0.04rem 0.15rem;
+    font-weight: bolder;
+    display: inline-block;
+}
+.talkBoxCenter{
+    width: 3.36rem;
+    margin: 0 auto;
+}
+.role{
+    margin-right: 0.07rem;
+}
+.role1{
+    color: #192dda;
+}
+.role2{
+    color: #5dc434;
+}
+.role3{
+    color: #ec7728;
+}
+.talkBox .talkText{
+    color: #FFFFFF;
+}
+.talkBox .talkInput{
+    border-radius: 100px;
+    border: 1px solid #FFFFFF;
+    padding: 0.04rem 0.15rem;
+    font-size: 0.12rem;
+    color: #FFFFFF;
+    width: 3.06rem;
+    margin: 0.1rem 0rem;
+}
