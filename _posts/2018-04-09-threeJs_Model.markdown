@@ -41,8 +41,8 @@ OBJ导出来的仅仅是模型，MTL导出来的仅仅是材质，那么有动�
 * 添加一个XForm修改器于你的模型当你开始导出之前，他会重置你物件的位置，转向等等，将它变为初始那样，最小化在导出时可能遇到的问题<br>
 ![pic6](https://edisonzhang0401.github.io/CausulBlog/images/20180409/pic6.jpg)
 * 如果发生错误，修复完毕后需要重新启动3dmax才能正常使用导出插件
-* 可以先验证模型导出的数据量和点格式的正确与否再进行加载，一般导出文件的贴图地址会与你的地址不同，需要打开导出文件（如下图）修改贴图对应地址
-![pic7](https://edisonzhang0401.github.io/CausulBlog/images/20180409/pic7.jpg)
+* 可以先验证模型导出的数据量和点格式的正确与否再进行加载，一般导出文件的贴图地址会与你的地址不同，需要打开导出文件（如下图）修改贴图对应地址<br>
+![pic7](https://edisonzhang0401.github.io/CausulBlog/images/20180409/pic7.jpg)<br>
 ![pic8](https://edisonzhang0401.github.io/CausulBlog/images/20180409/pic8.jpg)
 * 加载过程中你有可能看不见模型，那么很有可能是你的模型过大或者过小，可以直接在代码中用scale函数进行调整测试
 * 如果还有问题，建议在重复以上几点查看一遍
