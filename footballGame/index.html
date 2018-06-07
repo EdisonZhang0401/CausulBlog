@@ -5,21 +5,18 @@
     <meta charset="UTF-8" name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="HandheldFriendly" content="true">
-    <title>Title</title>
+    <title>颠球大赛</title>
     <script src="js/phaser.min.js"></script>
+    <!--<script src="js/phaser.2.2.2.box2d.min.js"></script>-->
     <style>
         body{
             margin: 0;
             padding: 0;
         }
     </style>
-    <!--<script src="js/phaser.2.2.2.box2d.min.js"></script>-->
 </head>
 <body>
 <script>
-    // mods by Patrick OReilly
-    // twitter: @pato_reilly
-
     var game;
     var viewHeight=window.innerHeight||document.documentElement.clientHeight;
     var viewWidth=window.innerWidth||document.documentElement.clientWidth;
@@ -33,40 +30,34 @@
         gWidth = 400;
         gHeight = 600;
     }
+
+    // 生成游戏
     game = new Phaser.Game(gWidth, gHeight, Phaser.CANVAS, 'phaser-example', { preload: preload, create: create, update: update, render: render });
+
+    //预加载
     function preload() {
-
         game.stage.backgroundColor = '#124184';
-        // game.load.image('background','assets/misc/starfield.jpg');
         game.load.image('player','img/ball.png');
-        // game.load.image('analog', 'assets/tests/fusia.png');
-        // game.load.image('arrow', 'assets/sprites/longarrow2.png');
-
+        // game.load.image('background','assets/misc/starfield.jpg');
     }
 
     var player;
-    var cursors;
-    var arrow;
     var catchFlag = false;
-    var launchVelocity = 0;
+    var score = 0;
+    var text;
+    var help = true;
 
     function create() {
+        // 文本
+        var style = { font: "65px Arial", fill: "#ff0044", align: "center" };
+        text = game.add.text(game.world.centerX, game.world.centerY, "分数："+score, style);
+        text.anchor.set(0.5);
 
         game.physics.startSystem(Phaser.Physics.ARCADE);
 
         game.physics.arcade.gravity.y = 800;
         game.world.setBounds(0, 0, gWidth, gHeight);
         game.add.tileSprite(0, 0, gWidth, gHeight, 'background');
-
-        analog = game.add.sprite(200, 450, 'analog');
-        analog.width = 8;
-        analog.rotation = 220;
-        analog.alpha = 0;
-        analog.anchor.setTo(0.5, 0.0);
-
-        arrow = game.add.sprite(100, 450, 'arrow');
-        arrow.anchor.setTo(0.1, 0.5);
-        arrow.alpha = 0;
 
         player = game.add.sprite(200, 320, 'player');
         player.width = 70;
@@ -89,74 +80,50 @@
 
     }
 
-    function set(player,pointer) {
-
-        catchFlag = true;
-        game.camera.follow(null);
-
-        player.body.moves = false;
-        player.body.velocity.setTo(0, 0);
-        arrow.reset(player.x, player.y);
-        analog.reset(player.x, player.y);
-
-    }
-
     function launch() {
-        // arrow.reset(player.x, player.y);
-        // analog.reset(player.x, player.y);
+        score ++;
+        var pointX = game.input.activePointer.worldX;
 
         catchFlag = false;
         player.body.moves = true;
         game.camera.follow(player, Phaser.Camera.FOLLOW_TOPDOWN);
 
-        arrow.alpha = 0;
-        analog.alpha = 0;
-
-        // Xvector = (arrow.x - player.x) * 3;
-        // Yvector = (arrow.y - player.y) * 3;
-        if(arrow.x == player.x){
-            arrow.x = player.x-100;
+        if(pointX <= player.x && pointX >= player.x-10){
+            pointX= pointX - 20;
+        }else if(pointX >= player.x && pointX <= player.x+10){
+            pointX = pointX+ 20;
         }
-        Xvector = (arrow.x - player.x)*3;
-        // if(Xvector > 0){
-        //     Xvector += 600;
-        // }else{
-        //     Xvector -= 600;
-        // }
-
-        Yvector = (arrow.y - player.y) * 3;
+        Xvector = (player.x - pointX)*12;
 
         player.body.velocity.setTo(Xvector, -500);
-        console.log(Xvector,arrow.x,player.x);
-        arrow.reset(player.x, player.y);
-
+        console.log(Xvector,pointX,player.x);
     }
 
     function update() {
-        arrow.rotation = game.physics.arcade.angleBetween(arrow, player);
-
+        text.setText("分数："+score);
+        if(help){
+            if(player.y >= gHeight/2){
+                console.log("stop!!");
+                help = false;
+            }
+        }
         if (catchFlag == true)
         {
             //  Track the ball sprite to the mouse
             player.x = game.input.activePointer.worldX;
             player.y = game.input.activePointer.worldY;
-
-            arrow.alpha = 1;
-            analog.alpha = 0.5;
-            analog.rotation = arrow.rotation - 3.14 / 2;
-            analog.height = game.physics.arcade.distanceBetween(arrow, player);
-            launchVelocity = analog.height;
         }
-
+        // console.log(gHeight-player.height);
+        if(player.y >= gHeight-player.height/2){
+            score = 0;
+        }
     }
 
     function render() {
-
         // game.debug.text("Drag the sprite and release to launch", 32, 32, 'rgb(0,255,0)');
         // game.debug.cameraInfo(game.camera, 32, 64);
         // game.debug.spriteCoords(player, 32, 150);
         // game.debug.text("Launch Velocity: " + parseInt(launchVelocity), 550, 32, 'rgb(0,255,0)');
-
     }
 
     //设备检测

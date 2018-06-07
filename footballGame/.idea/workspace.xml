@@ -26,8 +26,8 @@
       <file leaf-file-name="index.html" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/index.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="475">
-              <caret line="138" column="9" lean-forward="true" selection-start-line="138" selection-start-column="9" selection-end-line="138" selection-end-column="9" />
+            <state relative-caret-position="739">
+              <caret line="109" selection-start-line="109" selection-end-line="114" selection-end-column="9" />
             </state>
           </provider>
         </entry>
@@ -55,12 +55,13 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>launch</find>
       <find>player</find>
       <find>analog</find>
       <find>arrow.x</find>
-      <find>arrow</find>
       <find>browserType</find>
+      <find>arrow</find>
+      <find>launch</find>
+      <find>launchVelocity</find>
     </findStrings>
   </component>
   <component name="IdeDocumentHistory">
@@ -115,7 +116,7 @@
   </component>
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="C:/WORK/project/sdg/m/CN" />
     <property name="node.js.detected.package.prettier" value="true" />
     <property name="node.js.path.for.package.prettier" value="project" />
     <property name="node.js.selected.package.prettier" value="" />
@@ -145,12 +146,12 @@
       <option name="presentableId" value="Default" />
       <updated>1528270726832</updated>
       <workItem from="1528270728045" duration="10620000" />
-      <workItem from="1528337605186" duration="7560000" />
+      <workItem from="1528337605186" duration="18031000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="18180000" />
+    <option name="totallyTimeSpent" value="28651000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="2552" y="-8" width="1216" height="1936" extended-state="6" />
@@ -225,8 +226,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/index.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="475">
-          <caret line="138" column="9" lean-forward="true" selection-start-line="138" selection-start-column="9" selection-end-line="138" selection-end-column="9" />
+        <state relative-caret-position="739">
+          <caret line="109" selection-start-line="109" selection-end-line="114" selection-end-column="9" />
         </state>
       </provider>
     </entry>
