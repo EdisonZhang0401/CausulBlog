@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta charset="UTF-8" name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="HandheldFriendly" content="true">
+    <title>颠球大赛</title>
+    <script src="js/phaser.min.js"></script>
+    <!--<script src="js/phaser.2.2.2.box2d.min.js"></script>-->
+    <style>
+        body{
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+<script>
+    var game;
+    var viewHeight=window.innerHeight||document.documentElement.clientHeight;
+    var viewWidth=window.innerWidth||document.documentElement.clientWidth;
+    var gWidth,gHeight;
+    var isBrowser=browserType();
+    var help = true;
+
+    //判断设备，宽高获取
+    if (isBrowser.isPhone) {
+        gWidth = viewWidth;
+        gHeight = viewHeight;
+    }else{
+        gWidth = 400;
+        gHeight = 600;
+    }
+
+    // 生成游戏
+    game = new Phaser.Game(gWidth, gHeight, Phaser.CANVAS, 'game-area');
+    game.state.add("boot", Boot);
+    game.state.add("loading", Loading);
+    game.state.add("menu", Menu);
+    game.state.add("main", Main);
+    game.state.start("boot");
+
+    //载入
+    function Boot(game){
+        this.preload = function() {
+            console.log("boot");
+        };
+        this.create = function() {
+            game.state.start("loading");
+        }
+    }
+
+    //加载页
+    function Loading(game){
+        this.preload=function () {
+            game.load.onFileComplete.add(fileComplete, this);
+            game.load.image('player','img/ball.png');
+            game.load.spritesheet('fire', 'img/fireball.png', 100, 134);
+        };
+        this.create=function () {
+            game.state.start("menu");
+        };
+    }
+
+    //菜单页
+    function Menu(game) {
+        this.preload = function() {
+        };
+        this.create = function() {
+            var start = game.add.text((game.width)/2, 300, "开始游戏", {fontSize: "16px", fill: "#fff" }).anchor.setTo(0.5);
+            var enterKey = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+            enterKey.onDown.add(function(){game.state.start("main");}, this);
+        };
+    }
+
+    //游戏主页
+    function Main(game) {
+        var player;
+        var score;
+        var text;
+        var catchFlag = false;
+        var act;
+        var fire;
+        var next = 1;
+        var power = -700;
+        this.preload = function() {
+            game.stage.backgroundColor = '#124184';
+            score = 0;
+        };
+        this.create = function(){
+            // 文本
+            var style = { font: "50px Arial", fill: "#ff0044", align: "center" };
+            text = game.add.text(game.world.centerX, 50, "分数："+score, style);
+            text.anchor.set(0.5);
+
+            // game.physics.startSystem(Phaser.Physics.ARCADE);
+            game.physics.startSystem(Phaser.Physics.P2JS);
+
+            game.physics.p2.gravity.y = 800;
+            game.physics.p2.restitution = 0.8;
+
+            player = game.add.sprite(200, 320, 'player');
+            player.width = 70;
+            player.height = 70;
+
+
+            fire = game.add.sprite(100, 200, 'fire');
+            fire.width = 120;
+            fire.height = 160;
+            anim = fire.animations.add('fly', [0,1,2,3,4,5,6,7,8,9,10], 10, true);
+            anim.play();
+            fire.alpha = 0;
+            // anim.onLoop.add(this.animationLooped, this);
+            // act = game.add.sprite(player.x, player.y, 'ship');
+            // act.width = 70;
+            // act.height = 70;
+            // anim = act.animations.add('fly', [0,1,2,3,4,5], 10, true);
+            // anim.play(10, true);
+            // act.visible = false;
+
+            // anim = player.animations.add('fly', [0,1,2,3,4,5], 10, true);
+            player.inputEnabled = true;
+            player.events.onInputDown.add(function () {
+                console.log("play");
+                // anim.play(10, true);
+                fire.alpha = 1;
+                anim.loop = true;
+            });
+            // game.physics.enable([player], Phaser.Physics.ARCADE);
+            game.physics.p2.enable(player);
+            player.body.setCircle(30);
+
+            // Enable input.
+            player.inputEnabled = true;
+            player.input.start(0, true);
+            player.events.onInputDown.add(this.launch);
+            // player.events.onInputUp.add(launch);
+
+            game.camera.follow(player, Phaser.Camera.FOLLOW_TOPDOWN);
+        };
+        this.update = function(){
+            text.setText("分数："+score);
+            if (catchFlag == true)
+            {
+                //  Track the ball sprite to the mouse
+                player.x = game.input.activePointer.worldX;
+                player.y = game.input.activePointer.worldY;
+            }
+            // console.log(gHeight-player.height);
+            if(player.y >= gHeight-player.height/2){
+                score = 0;
+            }
+            if(fire){
+                fire.x = player.x-fire.width/2;
+                fire.y = player.y-fire.width/2-40;
+            }
+            if(fire.alpha > 0 && next == 1){
+                next = 0;
+                setTimeout(function () {
+                    fire.alpha -= 0.1;
+                    next = 1;
+                },200)
+            }
+            if(fire.alpha < 0){
+                fire.alpha = 0;
+            }
+            if(score >=20){
+                game.physics.p2.gravity.y = 1200;
+                power = -900;
+            }else{
+                game.physics.p2.gravity.y = 800;
+                power = -700;
+            }
+
+        };
+        this.launch = function () {
+            score ++;
+            var pointX = game.input.activePointer.worldX;
+
+            catchFlag = false;
+            player.body.moves = true;
+            game.camera.follow(player, Phaser.Camera.FOLLOW_TOPDOWN);
+
+            if(pointX <= player.x && pointX >= player.x-10){
+                pointX= pointX - 20;
+            }else if(pointX >= player.x && pointX <= player.x+10){
+                pointX = pointX+ 20;
+            }
+            Xvector = (player.x - pointX)*10;
+
+            player.body.velocity.x = Xvector;
+            player.body.velocity.y = power;
+
+            // player.body.velocity.setTo(Xvector, -500);
+            console.log(Xvector,pointX,player.x);
+        };
+
+    }
+
+    //文件加载监听
+    function fileComplete(progress, cacheKey, success, totalLoaded, totalFiles) {
+        console.log(progress);
+    }
+
+    //设备检测
+    function browserType() {
+        var u = window.navigator.userAgent.toLowerCase();
+        var bIsIpad = u.match(/ipad/i) == "ipad";
+        var bIsIphoneOs = u.match(/iphone os/i) == "iphone os";
+        var bIsMidp = u.match(/midp/i) == "midp";
+        var bIsUc7 = u.match(/rv:1.2.3.4/i) == "rv:1.2.3.4";
+        var bIsUc = u.match(/ucweb/i) == "ucweb";
+        var bIsAndroid = u.match(/android/i) == "android";
+        var bIsCE = u.match(/windows ce/i) == "windows ce";
+        var bIsWM = u.match(/windows mobile/i) == "windows mobile";
+        var bIsIOS = !!u.match(/\(i[^;]+;( u;)? cpu.+mac os x/) || u.indexOf('ios') > -1;
+        var isPhone = false;
+        var isPc = false;
+        if (bIsIpad || bIsIphoneOs || bIsMidp || bIsUc7 || bIsUc || bIsAndroid || bIsCE || bIsWM || bIsIOS) {
+            isPhone = true;
+        } else {
+            isPc = true;
+        }
+        var Obj = {
+            userAgent: u,
+            isWindows: u.match(/windows/i) == "windows",
+            isMac: u.match(/macintosh/i) == "macintosh",
+            isWeChat: u.match(/MicroMessenger/i) == "micromessenger",
+            isWeibo: u.match(/WeiBo/i) == "weibo",
+            isBeareadApp: u.indexOf('bearead') > -1,
+            isAndroid: u.indexOf('android') > -1 || u.indexOf('adr') > -1,
+            isIOS: bIsIOS,
+            isQQ: u.match(/qq\//i) == "qq/",
+            isPC: isPc,
+            isPhone: isPhone
+        };
+        return Obj;
+    }
+
+</script>
+</body>
+</html>
