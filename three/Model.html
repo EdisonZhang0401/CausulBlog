@@ -11,6 +11,8 @@
     <script src="JS/DDSLoader.js"></script>
     <script src="JS/dat.gui.js"></script>
     <script src="JS/TrackballControls.js"></script>
+    <script src="JS/inflate.min.js"></script>
+    <script src="JS/FBXLoader.js"></script>
     <script src="JS/jquery.js"></script>
     <style>
         html,body{
@@ -28,13 +30,28 @@
             height: 100%;
             background-color: #EEEEEE;
         }
+        .sceneBtn{
+            font-size: 18px;
+        }
+        .canvasWrap{
+            width: 100%;
+            height: 100%;
+        }
+        .uploadWrap{
+            position: absolute;
+            right: 0px;
+            top: 0px;
+            width: 200px;
+            height: 100%;
+        }
     </style>
 </head>
 <script>
     window.onload = function () {
         threeStart();
     }
-
+    var mixers = [];
+    var clock = new THREE.Clock();
     var three ={
         renderer:"",
         stats:"",
@@ -51,7 +68,8 @@
                 antialias : true
             });
             renderer.setSize(width, height);//渲染器宽高
-            renderer.shadowMapEnabled = true; //显示阴影
+            renderer.shadowMap.enabled = true; //显示阴影
+            renderer.shadowMap.type=THREE.PCFSoftShadowMap;
 
             document.getElementById('canvas').appendChild(renderer.domElement);
             renderer.setClearColor(0x202020, 1.0);
@@ -92,16 +110,42 @@
         },
         //Light光源建立
         initLight:function () {
-            // light = new THREE.AmbientLight(0xFFFFFF);
-            // light.position.set(100, 100, 200);
+            light = new THREE.AmbientLight(0xFFFFFF,0.8);
+            light.position.set(100, 100, 200);
+            scene.add(light);
+
+            // var ambientLight = new THREE.AmbientLight( 0xffffff, 1);
+            // scene.add( ambientLight );
+
+            // var pointLight = new THREE.PointLight( 0xffffff, 0.8 );
+            // pointLight.castShadow = true;
+            // camera.add( pointLight );
+            // scene.add( camera );
+
+            // var Hlight = new THREE.HemisphereLight( 0xffffff, 0x444444 );
+            // Hlight.position.set( 0, 200, 0 );
+            // scene.add( Hlight );
+
+            // light = new THREE.HemisphereLight( 0xffffff, 0x444444 );
+            // light.position.set( 0, 200, 0 );
+            // scene.add( light );
+
+            light = new THREE.DirectionalLight( 0xffffff ,0.8);
+            light.position.set( 0, 100, -100 );
+            light.castShadow = true;
+            light.shadow.mapSize.width = 2048;  // 阴影质量
+            light.shadow.mapSize.height = 2048; // 阴影质量
+            light.shadow.camera.top = 180;
+            light.shadow.camera.bottom = -100;
+            light.shadow.camera.left = -120;
+            light.shadow.camera.right = 120;
+            scene.add( light );
+
+            // light = new THREE.SpotLight(0xffffff);
+            // light.position.set( 0, 1000, 1000 );
+            // light.castShadow = true;
             // scene.add(light);
 
-            var ambientLight = new THREE.AmbientLight( 0xffffff, 0.4 );
-            scene.add( ambientLight );
-
-            var pointLight = new THREE.PointLight( 0xffffff, 0.8 );
-            camera.add( pointLight );
-            scene.add( camera );
         },
         //球形背景建立
         initBack:function (){
@@ -115,7 +159,16 @@
         },
         //物体建立 添加入场景
         initObject:function (url,obj,mtl) {
+            // ground
+            var mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2000, 2000 ), new THREE.MeshPhongMaterial( { color: 0x999999, depthWrite: false } ) );
+            mesh.rotation.x = - Math.PI / 2;
+            mesh.receiveShadow = true;
+            scene.add( mesh );
+
             createFish(url,obj,mtl);
+            // createCube();
+            createFBX();
+            // createJson();
         },
         //辅助线
         initGrid:function () {
@@ -128,14 +181,49 @@
             //mesh.rotation.x +=0.01;
             renderer.render(scene, camera);
             requestAnimationFrame(three.animation);
+            if ( mixers.length > 0 ) {
+
+                for ( var i = 0; i < mixers.length; i ++ ) {
+
+                    mixers[ i ].update( clock.getDelta() );
+
+                }
+
+            }
             controls.update();
             stats.update();
-
         }
-
     }
 
-    //模型调用
+    //fbx模型调用
+    function createFBX() {
+        var loader = new THREE.FBXLoader();
+        loader.load("models/fbx/dance.fbx", function ( object ) {
+
+            object.mixer = new THREE.AnimationMixer( object );
+            mixers.push( object.mixer );
+
+            var action = object.mixer.clipAction( object.animations[ 0 ] );
+            action.play();
+
+            object.traverse( function ( child ) {
+
+                if ( child.isMesh ) {
+                    child.geometry.computeVertexNormals();//解决fbx阴影不出现bug
+                    child.material.specular.set(0,0,0);//去除高光
+                    // child.geometry.mergeVertices();
+                    // child.material.flatShading = true;
+                    child.castShadow = true;
+                    child.receiveShadow = true;
+                }
+
+            } );
+            scene.add( object );
+            console.log(object);
+        } );
+    }
+
+    //obj模型调用
     function createFish(url,obj,mtl) {
 
         //var materialNormal = new THREE.MeshBasicMaterial({color: 0x00ff00});
@@ -152,7 +240,7 @@
 
         var mtlLoader = new THREE.MTLLoader();
 
-        mtlLoader.setBaseUrl(url);
+        // mtlLoader.setBaseUrl(url);
         mtlLoader.setPath(url);
         mtlLoader.load( mtl, function( materials ) {
             materials.preload();
@@ -162,8 +250,23 @@
             objLoader.setPath(url);
             objLoader.load(obj, function ( object ) {
                 object.scale.set(2, 2, 2);
+                object.castShadow = true;
+                object.receiveShadow = true;
+
+                object.traverse( function ( child ) {
+
+                    if ( child.isMesh ) {
+                        child.geometry.computeVertexNormals();//解决fbx阴影不出现bug
+                        child.material.specular.set(0,0,0);//去除高光
+                        // child.geometry.mergeVertices();
+                        // child.material.flatShading = true;
+                        child.castShadow = true;
+                        child.receiveShadow = true;
+                    }
+
+                } );
+
                 scene.add( object );
-                console.log(object);
 
             }, onProgress, onError );
 
@@ -174,22 +277,25 @@
 
 
     }
-    //正方形，模型创建
+
+    //正方形创建
     function createCube() {
         var geometry = new THREE.BoxGeometry( 100, 100, 100 );
 
-        for ( var i = 0; i < geometry.faces.length; i += 2 ) {
-            
-            var hex = Math.random() * 0xffffff;
-            geometry.faces[ i ].color.setHex( hex );
-            geometry.faces[ i + 1 ].color.setHex( hex );
+        // for ( var i = 0; i < geometry.faces.length; i += 2 ) {
+        //
+        //     var hex = Math.random() * 0xffffff;
+        //     geometry.faces[ i ].color.setHex( hex );
+        //     geometry.faces[ i + 1 ].color.setHex( hex );
+        //
+        // }
 
-        }
-
-        var material = new THREE.MeshBasicMaterial( { vertexColors: THREE.FaceColors} );
+        var material = new THREE.MeshLambertMaterial({color: Math.random() * 0xffffff});
         mesh = new THREE.Mesh( geometry,material);
-        mesh.position = new THREE.Vector3(0,0,0);
+        mesh.position.set( 0, 100, 0 );
         mesh.castShadow = true;
+        mesh.receiveShadow = true;
+        console.log(mesh.geometry);
         scene.add(mesh);
     }
     
@@ -211,16 +317,63 @@
         three.initLight();
 
         // three.initBack();
-        three.initObject("models/obj/baking/","box.obj","box.mtl");
+        three.initObject("models/obj/building/","building.obj","building.mtl");
         three.initGrid();
 
         three.animation();
 
     }
 
+    //图片上传
+    // function imgUp() {
+    //     var upload = document.getElementById('upload');
+    //     upload.addEventListener('change', function() {
+    //     if($(".pageImg").length>2){
+    //         $(".pageAdd").hide();
+    //     }else{
+    //     }
+    //     var upload = document.getElementById('upload'); //每次要动态获取
+    //     var file = upload.files[0];
+    //     if(file.size>4194304){
+    //         alert("请上传小于4M的照片");
+    //     }else{
+    //         var objUrl = getObjectURL(file);
+    //         // 转base64放进数组
+    //         var image = new Image();
+    //         image.crossOrigin = '';
+    //         image.src = objUrl;
+    //         image.onload = function(){
+    //             var base64 = getBase64Image(image);
+    //             imgArr.push(base64);
+    //         }
+    //         $(".page1Ul").append("<li class=\"pageImg\"><img src="+objUrl+"><a class=\"imgClose\"></a></li>");
+    //     }
+    //
+    //     // 删除
+    //     $(".imgClose").on("touchend",function () {
+    //         var num = $(this).index(this);
+    //         imgArr.splice(num,1);
+    //         $(this).parent().remove();
+    //         $(".pageAdd").show();
+    //     })
+    //     })
+    // }
 
 </script>
 <body>
-<div id="canvas"></div>
+<div id="topPage" style="display: none">
+    <input class="sceneBtn" type="button" value="创建场景">
+    <input class="sceneBtn" type="button" value="加载场景">
+</div>
+<div class="canvasWrap">
+    <div id="canvas"></div>
+    <div class="uploadWrap">
+        <form>
+            <input type="file" name="obj"/>
+            <input type="file" name="mtl"/>
+            <input type="file" name="img"/>
+        </form>
+    </div>
+</div>
 </body>
 </html>
